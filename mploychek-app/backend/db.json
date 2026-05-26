@@ -1,0 +1,136 @@
+{
+  "users": [
+    {
+      "id": "u001",
+      "userId": "admin@mploychek.com",
+      "password": "$2a$10$FYJImE4rmcAoFA.9Oa.8nObxNglDW/dehqLtDXzKevqyeQn98BgP2",
+      "name": "Arvind R A",
+      "role": "Admin",
+      "department": "Engineering",
+      "joinDate": "2022-01-15",
+      "status": "Active"
+    },
+    {
+      "id": "u002",
+      "userId": "divyanshu@mploychek.com",
+      "password": "$2a$10$FYJImE4rmcAoFA.9Oa.8nObxNglDW/dehqLtDXzKevqyeQn98BgP2",
+      "name": "Betu",
+      "role": "General User",
+      "department": "Backend Engineering",
+      "joinDate": "2026-05-25",
+      "status": "Active"
+    },
+    {
+      "id": "u003",
+      "userId": "melody@mploychek.com",
+      "password": "$2a$10$FYJImE4rmcAoFA.9Oa.8nObxNglDW/dehqLtDXzKevqyeQn98BgP2",
+      "name": "Melody Fernandez",
+      "role": "General User",
+      "department": "HR",
+      "joinDate": "2023-06-10",
+      "status": "Active"
+    },
+    {
+      "id": "u004",
+      "userId": "giri@mploychek.com",
+      "password": "$2a$10$FYJImE4rmcAoFA.9Oa.8nObxNglDW/dehqLtDXzKevqyeQn98BgP2",
+      "name": "Giri Venkataramanan",
+      "role": "Admin",
+      "department": "Technology",
+      "joinDate": "2022-01-15",
+      "status": "Active"
+    },
+    {
+      "id": "8dd8c460-2d77-4104-bd66-0da9883e277f",
+      "userId": "divyanshutiwari337@gmail.com",
+      "password": "$2a$10$FUNHzZK7gXPQyjeVw9ZDvewxumpoeGwmp89ozuIncPx7oyzBd5c7W",
+      "name": "Divyanshu Tiwari",
+      "role": "General User",
+      "department": "Developer",
+      "joinDate": "2026-05-26",
+      "status": "Active"
+    }
+  ],
+  "verificationRecords": [
+    {
+      "id": "r001",
+      "candidateName": "Rahul Sharma",
+      "company": "TCS",
+      "verificationType": "Employment",
+      "status": "Verified",
+      "requestedBy": "u002",
+      "date": "2026-05-20",
+      "riskLevel": "Low"
+    },
+    {
+      "id": "r002",
+      "candidateName": "Priya Patel",
+      "company": "Infosys",
+      "verificationType": "Education",
+      "status": "Pending",
+      "requestedBy": "u002",
+      "date": "2026-05-22",
+      "riskLevel": "Medium"
+    },
+    {
+      "id": "r003",
+      "candidateName": "Amit Kumar",
+      "company": "Wipro",
+      "verificationType": "Criminal",
+      "status": "In Progress",
+      "requestedBy": "u003",
+      "date": "2026-05-21",
+      "riskLevel": "High"
+    },
+    {
+      "id": "r004",
+      "candidateName": "Sneha Reddy",
+      "company": "HCL",
+      "verificationType": "Address",
+      "status": "Verified",
+      "requestedBy": "u002",
+      "date": "2026-05-18",
+      "riskLevel": "Low"
+    },
+    {
+      "id": "r005",
+      "candidateName": "Vikram Singh",
+      "company": "Accenture",
+      "verificationType": "Employment",
+      "status": "Failed",
+      "requestedBy": "u003",
+      "date": "2026-05-19",
+      "riskLevel": "High"
+    },
+    {
+      "id": "r006",
+      "candidateName": "Neha Gupta",
+      "company": "Cognizant",
+      "verificationType": "Education",
+      "status": "Verified",
+      "requestedBy": "u004",
+      "date": "2026-05-17",
+      "riskLevel": "Low"
+    },
+    {
+      "id": "r007",
+      "candidateName": "Suresh Menon",
+      "company": "Tech Mahindra",
+      "verificationType": "Criminal",
+      "status": "Pending",
+      "requestedBy": "u001",
+      "date": "2026-05-23",
+      "riskLevel": "Medium"
+    },
+    {
+      "id": "r008",
+      "candidateName": "Kavya Nair",
+      "company": "Flipkart",
+      "verificationType": "Employment",
+      "status": "In Progress",
+      "requestedBy": "u002",
+      "date": "2026-05-24",
+      "riskLevel": "Low"
+    }
+  ]
+}

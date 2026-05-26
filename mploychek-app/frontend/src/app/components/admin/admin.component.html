@@ -1,0 +1,221 @@
+<!-- ── Nav ─────────────────────────────────────────────────────── -->
+<nav class="topnav">
+  <div class="nav-brand">
+    <span class="material-icons">fingerprint</span>
+    <span>MPLOYCHECK</span>
+    <span class="nav-divider">/</span>
+    <span class="nav-section">User Management</span>
+  </div>
+  <div class="nav-right">
+    <button class="btn btn-outline btn-sm" routerLink="/dashboard">
+      <span class="material-icons">dashboard</span> Dashboard
+    </button>
+    <div class="user-chip">
+      <div class="avatar">{{ auth.currentUser?.name?.charAt(0) }}</div>
+      <span class="user-name">{{ auth.currentUser?.name }}</span>
+    </div>
+  </div>
+</nav>
+
+<div class="page-content">
+
+  <!-- Flash messages -->
+  <div class="alert alert-success" *ngIf="successMsg">
+    <span class="material-icons">check_circle</span> {{ successMsg }}
+  </div>
+  <div class="alert alert-error" *ngIf="error && !showModal">
+    <span class="material-icons">error</span> {{ error }}
+    <button class="close-alert" (click)="error=''">✕</button>
+  </div>
+
+  <!-- ── Users Table Card ──────────────────────────────────────── -->
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <h2>System Users</h2>
+        <p class="text-muted">Manage user accounts and access roles</p>
+      </div>
+      <button class="btn btn-primary" (click)="openCreate()">
+        <span class="material-icons">person_add</span> Add User
+      </button>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-row" *ngIf="loading">
+      <div class="spinner"></div>
+      <span>Loading users…</span>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrapper" *ngIf="!loading">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>User ID</th>
+            <th>Role</th>
+            <th>Department</th>
+            <th>Joined</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let u of users">
+            <td>
+              <div class="user-cell">
+                <div class="sm-avatar">{{ u.name.charAt(0) }}</div>
+                <div>
+                  <strong>{{ u.name }}</strong>
+                  <span *ngIf="isSelf(u)" class="you-tag">you</span>
+                </div>
+              </div>
+            </td>
+            <td class="text-muted">{{ u.userId }}</td>
+            <td>
+              <span class="badge" [ngClass]="u.role === 'Admin' ? 'badge-admin' : 'badge-user'">
+                {{ u.role }}
+              </span>
+            </td>
+            <td>{{ u.department }}</td>
+            <td class="text-muted">{{ u.joinDate }}</td>
+            <td>
+              <span class="badge" [ngClass]="u.status === 'Active' ? 'badge-success' : 'badge-danger'">
+                {{ u.status }}
+              </span>
+            </td>
+            <td>
+              <div class="action-btns">
+                <button class="btn btn-sm btn-outline icon-btn" (click)="openEdit(u)" title="Edit">
+                  <span class="material-icons">edit</span>
+                </button>
+                <button class="btn btn-sm btn-danger icon-btn" (click)="confirmDelete(u)"
+                        [disabled]="isSelf(u)" [title]="isSelf(u) ? 'Cannot delete own account' : 'Delete'">
+                  <span class="material-icons">delete</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card-footer" *ngIf="users.length">{{ users.length }} users in system</div>
+  </div>
+
+</div>
+
+<!-- ══════════ CREATE / EDIT MODAL ══════════ -->
+<div class="modal-backdrop" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <h3>
+        <span class="material-icons">{{ modalMode === 'create' ? 'person_add' : 'edit' }}</span>
+        {{ modalMode === 'create' ? 'Add New User' : 'Edit User' }}
+      </h3>
+      <button class="btn btn-sm" style="color:#7f8c8d" (click)="closeModal()">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="alert alert-error" *ngIf="error && showModal">
+        <span class="material-icons">error</span> {{ error }}
+      </div>
+
+      <form [formGroup]="userForm" (ngSubmit)="onSubmit()" novalidate>
+
+        <div class="form-grid">
+          <!-- Full Name -->
+          <div class="form-group">
+            <label>Full Name *</label>
+            <input type="text" class="form-control" formControlName="name" placeholder="John Doe">
+            <span class="field-error" *ngIf="f['name'].invalid && f['name'].touched">
+              Name is required (min 2 chars)
+            </span>
+          </div>
+
+          <!-- User ID (email) -->
+          <div class="form-group">
+            <label>User ID (Email) *</label>
+            <input type="email" class="form-control" formControlName="userId"
+                   placeholder="john@mploychek.com"
+                   [class.disabled-field]="modalMode === 'edit'">
+            <span class="field-error" *ngIf="f['userId'].invalid && f['userId'].touched">
+              Valid email required
+            </span>
+          </div>
+
+          <!-- Password -->
+          <div class="form-group">
+            <label>Password {{ modalMode === 'edit' ? '(leave blank to keep)' : '*' }}</label>
+            <input type="password" class="form-control" formControlName="password"
+                   placeholder="{{ modalMode === 'create' ? 'Min 6 characters' : '••••••••' }}">
+            <span class="field-error" *ngIf="f['password'].invalid && f['password'].touched">
+              Password must be at least 6 characters
+            </span>
+          </div>
+
+          <!-- Role -->
+          <div class="form-group">
+            <label>Role *</label>
+            <select class="form-control" formControlName="role">
+              <option value="General User">General User</option>
+              <option value="Admin">Admin</option>
+            </select>
+          </div>
+
+          <!-- Department -->
+          <div class="form-group">
+            <label>Department *</label>
+            <input type="text" class="form-control" formControlName="department"
+                   placeholder="Engineering, HR, etc.">
+            <span class="field-error" *ngIf="f['department'].invalid && f['department'].touched">
+              Department is required
+            </span>
+          </div>
+
+          <!-- Status (edit only) -->
+          <div class="form-group" *ngIf="modalMode === 'edit'">
+            <label>Status</label>
+            <select class="form-control" formControlName="status">
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer" style="padding: 0; margin-top: 8px;">
+          <button type="button" class="btn btn-outline" (click)="closeModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" [disabled]="formLoading">
+            <span class="spinner-sm" *ngIf="formLoading"></span>
+            <span class="material-icons" *ngIf="!formLoading">{{ modalMode === 'create' ? 'add' : 'save' }}</span>
+            {{ formLoading ? 'Saving…' : (modalMode === 'create' ? 'Create User' : 'Save Changes') }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ DELETE CONFIRM MODAL ══════════ -->
+<div class="modal-backdrop" *ngIf="showDeleteConfirm" (click)="cancelDelete()">
+  <div class="modal confirm-modal" (click)="$event.stopPropagation()">
+    <div class="modal-body confirm-body">
+      <div class="confirm-icon">
+        <span class="material-icons">warning</span>
+      </div>
+      <h3>Delete User</h3>
+      <p>Are you sure you want to delete <strong>{{ deleteTarget?.name }}</strong>?
+        This action cannot be undone.</p>
+      <div class="confirm-actions">
+        <button class="btn btn-outline" (click)="cancelDelete()">Cancel</button>
+        <button class="btn btn-danger" (click)="doDelete()" [disabled]="deleteLoading">
+          <span class="spinner-sm" *ngIf="deleteLoading"></span>
+          {{ deleteLoading ? 'Deleting…' : 'Delete' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

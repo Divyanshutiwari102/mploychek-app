@@ -1,0 +1,198 @@
+<!-- Loading overlay (async demo) -->
+<div class="spinner-overlay" *ngIf="loadingRecords">
+  <div class="spinner"></div>
+  <p class="loading-text">
+    <span *ngIf="delayMs > 0">Simulating {{ delayMs }}ms API delay…</span>
+    <span *ngIf="delayMs === 0">Loading verification records…</span>
+  </p>
+</div>
+
+<!-- ── Top Nav ────────────────────────────────────────────────────── -->
+<nav class="topnav">
+  <div class="nav-brand">
+    <span class="material-icons">fingerprint</span>
+    <span>MPLOYCHECK</span>
+  </div>
+  <div class="nav-right">
+    <button *ngIf="auth.isAdmin" class="btn btn-outline btn-sm" (click)="goAdmin()">
+      <span class="material-icons">manage_accounts</span> Manage Users
+    </button>
+    <div class="user-chip">
+      <div class="avatar">{{ user?.name?.charAt(0) }}</div>
+      <div class="user-info">
+        <span class="user-name">{{ user?.name }}</span>
+        <span class="badge" [ngClass]="user?.role === 'Admin' ? 'badge-admin' : 'badge-user'">
+          {{ user?.role }}
+        </span>
+      </div>
+    </div>
+    <button class="btn btn-sm" style="color:#7f8c8d" (click)="logout()" title="Logout">
+      <span class="material-icons">logout</span>
+    </button>
+  </div>
+</nav>
+
+<div class="page-content">
+
+  <!-- ── User Profile Card ──────────────────────────────────────── -->
+  <section class="profile-section">
+    <div class="profile-card card">
+      <div class="profile-avatar">{{ user?.name?.charAt(0) }}</div>
+      <div class="profile-details">
+        <h2>{{ user?.name }}</h2>
+        <p class="text-muted">{{ user?.userId }}</p>
+        <span class="badge mt-4" [ngClass]="user?.role === 'Admin' ? 'badge-admin' : 'badge-user'">
+          {{ user?.role }}
+        </span>
+      </div>
+      <div class="profile-meta">
+        <div class="meta-item">
+          <span class="material-icons">business</span>
+          <div><small>Department</small><strong>{{ user?.department }}</strong></div>
+        </div>
+        <div class="meta-item">
+          <span class="material-icons">calendar_today</span>
+          <div><small>Joined</small><strong>{{ user?.joinDate }}</strong></div>
+        </div>
+        <div class="meta-item">
+          <span class="material-icons">circle</span>
+          <div>
+            <small>Status</small>
+            <strong>
+              <span class="badge badge-success">{{ user?.status }}</span>
+            </strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Stats Row ──────────────────────────────────────────────── -->
+  <section class="stats-row">
+    <div class="stat-card card">
+      <span class="material-icons stat-icon total">folder_open</span>
+      <div><div class="stat-num">{{ stats.total }}</div><div class="stat-label">Total Records</div></div>
+    </div>
+    <div class="stat-card card">
+      <span class="material-icons stat-icon verified">check_circle</span>
+      <div><div class="stat-num">{{ stats.verified }}</div><div class="stat-label">Verified</div></div>
+    </div>
+    <div class="stat-card card">
+      <span class="material-icons stat-icon pending">pending</span>
+      <div><div class="stat-num">{{ stats.pending }}</div><div class="stat-label">In Progress</div></div>
+    </div>
+    <div class="stat-card card">
+      <span class="material-icons stat-icon failed">cancel</span>
+      <div><div class="stat-num">{{ stats.failed }}</div><div class="stat-label">Failed</div></div>
+    </div>
+  </section>
+
+  <!-- ── Records Table ──────────────────────────────────────────── -->
+  <section class="card records-card">
+
+    <!-- Header -->
+    <div class="section-header">
+      <div>
+        <h3>Verification Records</h3>
+        <p class="text-muted" *ngIf="auth.isAdmin">Showing all records (Admin view)</p>
+        <p class="text-muted" *ngIf="!auth.isAdmin">Showing your assigned records</p>
+      </div>
+
+      <!-- Async delay demo control -->
+      <div class="delay-control">
+        <label>
+          <span class="material-icons">timer</span>
+          API Delay (ms):
+        </label>
+        <input type="number" class="form-control delay-input" [(ngModel)]="delayMs"
+               min="0" max="5000" step="500" placeholder="0">
+        <button class="btn btn-primary btn-sm" (click)="loadRecords()" [disabled]="loadingRecords">
+          <span class="material-icons">refresh</span> Reload
+        </button>
+      </div>
+    </div>
+
+    <!-- Async timing info banner -->
+    <div class="alert alert-info" *ngIf="showDelayInfo && !loadingRecords">
+      <span class="material-icons">info</span>
+      Async load completed in <strong>{{ actualLoadMs }}ms</strong>
+      <span *ngIf="delayMs > 0"> (simulated delay: {{ delayMs }}ms)</span>.
+      UI remained responsive throughout.
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+      <div class="input-wrap search-wrap">
+        <span class="material-icons input-icon">search</span>
+        <input type="text" class="form-control with-icon" placeholder="Search candidate or company…"
+               [(ngModel)]="searchTerm" (input)="applyFilters()">
+      </div>
+      <select class="form-control filter-select" [(ngModel)]="statusFilter" (change)="applyFilters()">
+        <option value="">All Statuses</option>
+        <option>Verified</option>
+        <option>Pending</option>
+        <option>In Progress</option>
+        <option>Failed</option>
+      </select>
+      <select class="form-control filter-select" [(ngModel)]="typeFilter" (change)="applyFilters()">
+        <option value="">All Types</option>
+        <option>Employment</option>
+        <option>Education</option>
+        <option>Criminal</option>
+        <option>Address</option>
+      </select>
+      <button *ngIf="searchTerm || statusFilter || typeFilter"
+              class="btn btn-outline btn-sm" (click)="clearFilters()">
+        <span class="material-icons">clear</span> Clear
+      </button>
+    </div>
+
+    <!-- Error -->
+    <div class="alert alert-error" *ngIf="recordsError">
+      <span class="material-icons">error</span> {{ recordsError }}
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrapper" *ngIf="!loadingRecords">
+      <table *ngIf="filteredRecords.length; else noData">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Candidate</th>
+            <th>Company</th>
+            <th>Type</th>
+            <th>Date</th>
+            <th>Risk</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of filteredRecords; let i = index" class="record-row">
+            <td class="text-muted">{{ i + 1 }}</td>
+            <td><strong>{{ r.candidateName }}</strong></td>
+            <td>{{ r.company }}</td>
+            <td>
+              <span class="type-chip">{{ r.verificationType }}</span>
+            </td>
+            <td class="text-muted">{{ r.date }}</td>
+            <td><span class="badge" [ngClass]="riskClass(r.riskLevel)">{{ r.riskLevel }}</span></td>
+            <td><span class="badge" [ngClass]="badgeClass(r.status)">{{ r.status }}</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <ng-template #noData>
+        <div class="no-data">
+          <span class="material-icons">search_off</span>
+          <p>No records match your filters</p>
+          <button class="btn btn-outline btn-sm" (click)="clearFilters()">Clear Filters</button>
+        </div>
+      </ng-template>
+    </div>
+
+    <div class="table-footer" *ngIf="filteredRecords.length">
+      Showing {{ filteredRecords.length }} of {{ records.length }} records
+    </div>
+  </section>
+
+</div>

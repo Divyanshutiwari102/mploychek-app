@@ -1,0 +1,118 @@
+<div class="login-page">
+  <!-- Left Panel -->
+  <div class="login-left">
+    <div class="brand">
+      <div class="brand-icon">
+        <span class="material-icons">fingerprint</span>
+      </div>
+      <h1>MPLOYCHECK</h1>
+      <p>AI-Driven Background Verification Platform</p>
+    </div>
+    <div class="features">
+      <div class="feature">
+        <span class="material-icons">verified_user</span>
+        <div>
+          <strong>Instant API Checks</strong>
+          <p>Connect to EPFO, E-Courts & more</p>
+        </div>
+      </div>
+      <div class="feature">
+        <span class="material-icons">link</span>
+        <div>
+          <strong>Blockchain Secured</strong>
+          <p>Owner-controlled, tamper-proof records</p>
+        </div>
+      </div>
+      <div class="feature">
+        <span class="material-icons">speed</span>
+        <div>
+          <strong>25% Faster Verification</strong>
+          <p>Smart routing engine cuts wait times</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Panel -->
+  <div class="login-right">
+    <div class="login-card">
+      <div class="login-header">
+        <h2>Welcome back</h2>
+        <p>Sign in to your account to continue</p>
+      </div>
+
+      <!-- Quick-fill buttons -->
+      <div class="presets">
+        <span class="preset-label">Quick fill:</span>
+        <button type="button" class="preset-btn admin"
+                (click)="fillPreset(presets[0])">
+          <span class="material-icons">admin_panel_settings</span> Admin
+        </button>
+        <button type="button" class="preset-btn user"
+                (click)="fillPreset(presets[1])">
+          <span class="material-icons">person</span> General User
+        </button>
+      </div>
+
+      <div *ngIf="error" class="alert alert-error">
+        <span class="material-icons">error_outline</span> {{ error }}
+      </div>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
+
+        <!-- User ID -->
+        <div class="form-group">
+          <label for="userId">User ID (Email)</label>
+          <div class="input-wrap">
+            <span class="material-icons input-icon">email</span>
+            <input id="userId" type="email" class="form-control with-icon"
+                   formControlName="userId" placeholder="you@mploychek.com" autocomplete="username">
+          </div>
+          <span class="field-error"
+                *ngIf="f['userId'].invalid && f['userId'].touched">
+            {{ f['userId'].errors?.['required'] ? 'Email is required' : 'Enter a valid email' }}
+          </span>
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="input-wrap">
+            <span class="material-icons input-icon">lock</span>
+            <input id="password" [type]="showPass ? 'text' : 'password'"
+                   class="form-control with-icon with-icon-right"
+                   formControlName="password" placeholder="••••••••" autocomplete="current-password">
+            <button type="button" class="toggle-pass" (click)="showPass = !showPass" tabindex="-1">
+              <span class="material-icons">{{ showPass ? 'visibility_off' : 'visibility' }}</span>
+            </button>
+          </div>
+          <span class="field-error"
+                *ngIf="f['password'].invalid && f['password'].touched">
+            Password must be at least 6 characters
+          </span>
+        </div>
+
+        <!-- Role -->
+        <div class="form-group">
+          <label for="role">Role</label>
+          <div class="input-wrap">
+            <span class="material-icons input-icon">badge</span>
+            <select id="role" class="form-control with-icon" formControlName="role">
+              <option value="General User">General User</option>
+              <option value="Admin">Admin</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" [disabled]="loading">
+          <span class="spinner-sm" *ngIf="loading"></span>
+          <span class="material-icons" *ngIf="!loading">login</span>
+          {{ loading ? 'Signing in…' : 'Sign In' }}
+        </button>
+
+      </form>
+
+      <p class="hint">Default password: <code>password123</code></p>
+    </div>
+  </div>
+</div>
